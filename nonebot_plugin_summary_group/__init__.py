@@ -5,7 +5,7 @@ from nonebot.params import CommandArg
 from collections import defaultdict
 from datetime import datetime, timedelta
 from math import ceil
-from .Config import config
+from .Config import config, Config
 from .Model import detect_model
 
 model = detect_model()
@@ -16,6 +16,8 @@ __plugin_meta__ = PluginMetadata(
     usage="1.总结 [消息数量] ：生成该群最近消息数量的内容总结\n2.总结 [@群友] [消息数量] ：生成指定群友相关内容总结",
     type="application",
     homepage="https://github.com/StillMisty/nonebot_plugin_summary_group",
+    config=Config,
+    supported_adapters={"~onebot.v11"},
 )
 
 summary_group = on_command("总结", priority=5, block=True)
