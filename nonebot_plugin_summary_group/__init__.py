@@ -5,11 +5,10 @@ from nonebot.params import CommandArg
 from collections import defaultdict
 from datetime import datetime, timedelta
 from math import ceil
-import httpx
 from .Config import config
+from .Model import detect_model
 
-if config.gemini_key is None:
-    raise ValueError("未提供 Gemini API Key。")
+model = detect_model()
 
 __plugin_meta__ = PluginMetadata(
     name="群聊总结",
@@ -48,35 +47,6 @@ async def get_group_msg_history(
     result.pop()  # 去除请求总结的命令
 
     return result
-
-
-async def summary_history(messages: list[dict[str, str]], prompt: str) -> str:
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{config.summary_model}:generateContent?key={config.gemini_key}"
-    headers = {"Content-Type": "application/json"}
-    data = {
-        "contents": [
-            {"parts": [{"text": prompt}], "role": "user"},
-            {"parts": [{"text": str(messages)}], "role": "user"},
-        ]
-    }
-
-    async with httpx.AsyncClient(proxy=config.proxy, timeout=60) as client:
-        try:
-            response = await client.post(url, json=data, headers=headers)
-            response.raise_for_status()
-
-            result = response.json()
-
-            return result["candidates"][0]["content"]["parts"][0]["text"]
-
-        except httpx.TimeoutException:
-            return "请求超时，请缩短总结消息数量或联系管理员调整超时时间"
-        except httpx.HTTPStatusError as e:
-            if e.response.status_code == 429:
-                return "API 调用次数已达上限，请稍后再试"
-            return f"API请求失败 (HTTP {e.response.status_code})"
-        except (httpx.RequestError, KeyError, ValueError) as e:
-            return f"请求发生错误: {str(e)}"
 
 
 def parse_command_args(args: Message):
@@ -123,14 +93,14 @@ async def _(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
 
     if qq is None:
         # 总结整个群聊内容
-        summary = await summary_history(
+        summary = await model.summary_history(
             messages, "请详细总结这个群聊的内容脉络，要有什么人说了什么，用中文回答。"
         )
     else:
         # 只针对某个用户的聊天内容进行总结
         member_info = await bot.get_group_member_info(group_id=group_id, user_id=qq)
         name: str = member_info["card"] or member_info["nickname"]
-        summary = await summary_history(
+        summary = await model.summary_history(
             messages,
             f"请总结对话中与{name}相关的内容，用中文回答。",
         )

@@ -1,6 +1,6 @@
 [project]
 name = "nonebot-plugin-summary-group"
-version = "0.3.3"
+version = "0.4.0"
 authors = [{ name = "StillMisty", email = "1772797842@qq.com" }]
 description = "基于Nonebot2，使用Gemini分析群聊记录，生成讨论内容的总结。"
 readme = "README.md"
@@ -17,7 +17,7 @@ classifiers = [
     "Topic :: Communications :: Chat",
 ]
 keywords = ["nonebot2", "nonebot", "plugin", "summary", "gemini", "group-chat"]
-dependencies = ["httpx", "nonebot-adapter-onebot", "nonebot2", "pydantic"]
+dependencies = ["httpx >= 0.27", "nonebot-adapter-onebot>=2.3", "nonebot2>=2.3"]
 
 [build-system]
 requires = ["setuptools"]
