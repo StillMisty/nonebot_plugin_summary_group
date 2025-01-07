@@ -40,7 +40,11 @@ pip install nonebot_plugin_summary_group
 
 若同时配置Gemini与OpenAI，则优先使用Gemini。
 
-若以图片形式发送，使用[hyrious/github-markdown-css](https://github.com/hyrious/github-markdown-css)渲染markdown文本样式。
+使用`nonebot_plugin_htmlrender`渲染图片，为节省不必要的消耗，此包不会作为该项目依赖，需要自行安装并设置`summary_in_png=True`以使用图片发送。
+
+``` shell
+nb plugin install nonebot_plugin_htmlrender
+```
 
 ## 🕹️ 使用
 
