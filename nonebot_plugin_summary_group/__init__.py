@@ -27,7 +27,7 @@ cool_down = defaultdict(lambda: datetime.now())
 
 if config.summary_in_png:
     require("nonebot_plugin_htmlrender")
-    from nonebot_plugin_htmlrender import md_to_pic
+    from nonebot_plugin_htmlrender import md_to_pic # type: ignore
 
 
 async def get_group_msg_history(
