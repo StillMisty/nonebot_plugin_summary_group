@@ -25,7 +25,7 @@ class Gemini(Model):
             ]
         }
 
-        async with httpx.AsyncClient(proxy=config.proxy, timeout=60) as client:
+        async with httpx.AsyncClient(proxy=config.proxy, timeout=config.time_out) as client:
             try:
                 response = await client.post(url, json=data, headers=headers)
                 response.raise_for_status()
@@ -69,7 +69,7 @@ class OpenAI(Model):
             ],
         }
 
-        async with httpx.AsyncClient(proxy=config.proxy, timeout=60) as client:
+        async with httpx.AsyncClient(proxy=config.proxy, timeout=config.time_out) as client:
             try:
                 response = await client.post(url, json=data, headers=headers)
                 response.raise_for_status()
