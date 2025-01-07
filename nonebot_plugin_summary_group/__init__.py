@@ -14,7 +14,7 @@ model = detect_model()
 __plugin_meta__ = PluginMetadata(
     name="群聊总结",
     description="使用 AI 分析群聊记录，生成讨论内容的总结。",
-    usage="1.总结 [消息数量]\n总结改群以上数量的信息\n2.总结 [QQ号] [消息数量]\n总结指定人相关信息 ",
+    usage="1.总结 [消息数量] ：生成该群最近消息数量的内容总结\n2.总结 [@群友] [消息数量] ：生成指定群友相关内容总结",
     type="application",
     homepage="https://github.com/StillMisty/nonebot_plugin_summary_group",
     config=Config,
@@ -27,7 +27,7 @@ cool_down = defaultdict(lambda: datetime.now())
 
 if config.summary_in_png:
     require("nonebot_plugin_htmlrender")
-    from nonebot_plugin_htmlrender import md_to_pic
+    from nonebot_plugin_htmlrender import md_to_pic # type: ignore
 
 
 async def get_group_msg_history(

@@ -2,7 +2,7 @@
 name = "nonebot-plugin-summary-group"
 version = "0.6.0"
 authors = [{ name = "StillMisty", email = "1772797842@qq.com" }]
-description = "基于Nonebot2，使用Gemini分析群聊记录，生成讨论内容的总结。"
+description = "基于 Nonebot2，使用 AI 分析群聊记录，生成讨论内容的总结。"
 readme = "README.md"
 license.file = "LICENSE"
 requires-python = ">=3.10"
