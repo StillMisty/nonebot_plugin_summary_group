@@ -32,6 +32,7 @@ pip install nonebot_plugin_summary_group
 | summary_max_length |       否       |       2000       |               总结最大长度                |
 | summary_min_length |       否       |        50        |               总结最小长度                |
 | summary_cool_down  |       否       |        0         | 总结冷却时间（0即无冷却，针对人，而非群） |
+|      time_out      |       否       |       120        |             API 请求超时时间              |
 
 其中，gemini_key为必填项，用于调用Gemini接口。若需要使用OpenAI兼容API则需要配置 openai_base_url 、 openai_api_key 与 summary_model。
 
