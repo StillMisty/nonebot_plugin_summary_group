@@ -1,3 +1,4 @@
+import asyncio
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message
 from nonebot.plugin import PluginMetadata
@@ -26,30 +27,54 @@ cool_down = defaultdict(lambda: datetime.now())
 async def get_group_msg_history(
     bot: Bot, group_id: int, count: int
 ) -> list[dict[str, str]]:
+    """获取群聊消息记录"""
     messages = await bot.get_group_msg_history(group_id=group_id, count=count)
+
+    # 预先收集所有需要查询的QQ号
+    qq_set: set[str] = {
+        segment["data"]["qq"]
+        for msg in messages["messages"]
+        for segment in msg["message"]
+        if segment["type"] == "at"
+    }
+
+    # 批量获取成员信息
+    qq_name: dict[str, str] = {}
+    if qq_set:
+        member_infos = await asyncio.gather(
+            *(bot.get_group_member_info(group_id=group_id, user_id=qq) for qq in qq_set)
+        )
+        qq_name.update(
+            {
+                str(info["user_id"]): info["card"] or info["nickname"]
+                for info in member_infos
+            }
+        )
 
     result = []
     for message in messages["messages"]:
-        text_segments = [
-            segment["data"]["text"].strip()
-            for segment in message["message"]
-            if segment["type"] == "text"
-        ]
+        text_segments = []
+        for segment in message["message"]:
+            if segment["type"] == "text":
+                text = segment["data"]["text"].strip()
+                if text:  # 只添加非空文本
+                    text_segments.append(text)
+            elif segment["type"] == "at":  # 处理@消息，替换为昵称
+                qq = segment["data"]["qq"]
+                text_segments.append(f"@{qq_name[qq]}")
 
-        # 如果没有文本内容则跳过
-        if not text_segments:
-            continue
+        if text_segments:  # 只处理有内容的消息
+            sender = message["sender"]["card"] or message["sender"]["nickname"]
+            result.append({sender: "".join(text_segments)})
 
-        msg_content = "".join(text_segments)
-        sender = message["sender"]["card"] or message["sender"]["nickname"]
-        result.append({sender: msg_content})
-
-    result.pop()  # 去除请求总结的命令
+    if result:  # 安全检查
+        result.pop()  # 去除请求总结的命令
 
     return result
 
 
 def parse_command_args(args: Message):
+    """解析命令参数，返回QQ号和消息数量"""
     qq: int | None = None
     num: int | None = None
     for seg in args:
@@ -62,7 +87,6 @@ def parse_command_args(args: Message):
 
 @summary_group.handle()
 async def _(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
-    # 解析消息中的@和数字
     qq, num = parse_command_args(args)
 
     # 如果没有数字或者@，则不处理

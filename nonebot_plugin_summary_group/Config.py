@@ -11,6 +11,7 @@ class Config(BaseModel):
     summary_max_length: int = 2000  # 总结最大长度
     summary_min_length: int = 50  # 总结最小长度
     summary_cool_down: int = 0  # 总结冷却时间（0即无冷却，针对人，而非群）
+    time_out: int = 120  # API 请求超时时间
 
 
 config = get_plugin_config(Config)
