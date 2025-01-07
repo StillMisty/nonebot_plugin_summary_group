@@ -12,6 +12,7 @@ class Config(BaseModel):
     summary_min_length: int = 50  # 总结最小长度
     summary_cool_down: int = 0  # 总结冷却时间（0即无冷却，针对人，而非群）
     time_out: int = 120  # API 请求超时时间
+    summary_in_png: bool = False  # 总结是否以图片形式发送
 
 
 config = get_plugin_config(Config)

@@ -1,6 +1,6 @@
 import asyncio
-from nonebot import on_command
-from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message
+from nonebot import on_command, require
+from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
 from nonebot.plugin import PluginMetadata
 from nonebot.params import CommandArg
 from collections import defaultdict
@@ -13,7 +13,7 @@ model = detect_model()
 
 __plugin_meta__ = PluginMetadata(
     name="群聊总结",
-    description="基于Nonebot2，使用Gemini分析群聊记录，生成讨论内容的总结。",
+    description="使用 AI 分析群聊记录，生成讨论内容的总结。",
     usage="1.总结 [消息数量] ：生成该群最近消息数量的内容总结\n2.总结 [@群友] [消息数量] ：生成指定群友相关内容总结",
     type="application",
     homepage="https://github.com/StillMisty/nonebot_plugin_summary_group",
@@ -24,6 +24,10 @@ __plugin_meta__ = PluginMetadata(
 summary_group = on_command("总结", priority=5, block=True)
 
 cool_down = defaultdict(lambda: datetime.now())
+
+if config.summary_in_png:
+    require("nonebot_plugin_htmlrender")
+    from nonebot_plugin_htmlrender import md_to_pic
 
 
 async def get_group_msg_history(
@@ -130,5 +134,11 @@ async def _(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
             messages,
             f"请总结对话中与{name}相关的内容，用中文回答。",
         )
-
-    await summary_group.finish(summary.strip())
+    if config.summary_in_png:
+        img = await md_to_pic(
+            summary,
+            css_path=__file__.replace("__init__.py", "assert/github-markdown-dark.css"),
+        )
+        await summary_group.finish(MessageSegment.image(img))
+    else:
+        await summary_group.finish(summary.strip())
