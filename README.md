@@ -35,7 +35,12 @@ pip install nonebot_plugin_summary_group
 |      time_out      |       否       |       120        |             API 请求超时时间              |
 |   summary_in_png   |       否       |      False       |          总结是否以图片形式发送           |
 
-其中，gemini_key为必填项，用于调用Gemini接口。若需要使用OpenAI兼容API则需要配置 openai_base_url 、 openai_api_key 与 summary_model。
+- 使用Gemini需要配置 gemini_key 与 summary_model。
+- 使用OpenAI兼容的API则需要配置 openai_base_url 、 openai_api_key 与 summary_model。
+
+若同时配置Gemini与OpenAI，则优先使用Gemini。
+
+若以图片形式发送，使用[hyrious/github-markdown-css](https://github.com/hyrious/github-markdown-css)渲染markdown文本样式。
 
 ## 🕹️ 使用
 
