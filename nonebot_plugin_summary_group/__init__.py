@@ -27,7 +27,7 @@ cool_down = defaultdict(lambda: datetime.now())
 
 if config.summary_in_png:
     require("nonebot_plugin_htmlrender")
-    from nonebot_plugin_htmlrender import md_to_pic # type: ignore
+    from nonebot_plugin_htmlrender import md_to_pic  # type: ignore
 
 
 async def get_group_msg_history(
@@ -36,15 +36,20 @@ async def get_group_msg_history(
     """获取群聊消息记录"""
     messages = await bot.get_group_msg_history(group_id=group_id, count=count)
 
-    # 预先收集所有需要查询的QQ号
-    qq_set: set[str] = {
-        segment["data"]["qq"]
-        for msg in messages["messages"]
-        for segment in msg["message"]
-        if segment["type"] == "at"
-    }
+    # 预先收集所有被@的QQ号，同时过滤掉非法消息
+    qq_set: set[str] = set()
+    for msg in messages["messages"]:
+        valid_segments = [
+            segment for segment in msg["message"] if isinstance(segment, dict)
+        ]
+        qq_set.update(
+            segment["data"]["qq"]
+            for segment in valid_segments
+            if segment["type"] == "at"
+        )
+        msg["message"] = valid_segments
 
-    # 批量获取成员信息
+    # 将所有被@的QQ号转换为其群昵称
     qq_name: dict[str, str] = {}
     if qq_set:
         member_infos = await asyncio.gather(
