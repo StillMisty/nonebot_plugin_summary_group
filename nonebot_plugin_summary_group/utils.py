@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 from math import ceil
+from pathlib import Path
 from nonebot import get_bot, require
 from nonebot.adapters.onebot.v11 import Bot, MessageSegment
 from datetime import datetime, timedelta
@@ -19,7 +20,9 @@ if config.summary_in_png:
     async def generate_image(summary: str):
         return await md_to_pic(
             summary,
-            css_path=__file__.replace("__init__.py", "assert/github-markdown-dark.css"),
+            css_path=(
+                Path(__file__).parent / "assert" / "github-markdown-dark.css"
+            ).resolve(),
         )
 
 
