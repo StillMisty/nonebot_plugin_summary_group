@@ -120,14 +120,13 @@ async def send_summary(bot: Bot, group_id: int, summary: str):
 
 
 async def scheduler_send_summary(group_id: int, least_message_count: int):
-    """定时发送总结"""
+    """定时发送总结，当获取的最早消息超过一天时不发送"""
     bot = get_bot()
     messages = (
         await bot.get_group_msg_history(group_id=group_id, count=least_message_count)
     )["messages"]
     if not messages:
         return
-    print(messages[0]["time"])
     if messages[0]["time"] > (datetime.now() - timedelta(hours=24)).timestamp():
         return
 
