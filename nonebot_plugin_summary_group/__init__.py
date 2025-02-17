@@ -125,7 +125,7 @@ async def _(
     data = {"time": int(time.result), "least_message_count": least_message_count.result}
     store.set(group_id, data)
     await summary_set.finish(
-        f"已设置定时总结，将在{time.result}时当群消息相交昨天多于{least_message_count.result}条消息时生成内容总结。",
+        f"已设置定时总结，将在{time.result}时当群消息相较昨天同时多于{least_message_count.result}条消息时生成内容总结。",
         at_sender=True,
     )
 
