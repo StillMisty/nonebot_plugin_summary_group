@@ -100,17 +100,14 @@ async def get_group_msg_history(
     return result
 
 
-async def messages_summary(
-    messages: list[dict[str, str]], content: str | None = None
-) -> str:
+async def messages_summary(messages: list[dict[str, str]], content: str) -> str:
     """使用模型对历史消息进行总结"""
-    if content:
-        return await model.summary_history(
-            messages, f"请总结对话中与{content}相关的内容，用中文回答。"
-        )
-    return await model.summary_history(
-        messages, "请详细总结这个群聊的内容脉络，要有什么人说了什么，用中文回答。"
+    prompt = (
+        f"请详细总结对话中仅与{content}相关的内容，用中文回答。"
+        if content
+        else "请详细总结这个群聊的内容脉络，要有什么人说了什么，用中文回答。"
     )
+    return await model.summary_history(messages, prompt)
 
 
 async def send_summary(bot: Bot, group_id: int, summary: str):

@@ -19,7 +19,6 @@ from nonebot_plugin_alconna import (  # noqa: E402
     Args,
     CommandMeta,
     Match,
-    MultiVar,
     on_alconna,
 )
 
@@ -38,7 +37,7 @@ summary_group = on_alconna(
     Alconna(
         "总结",
         Args["message_count", int],
-        Args["content", str, MultiVar(None)],
+        Args["content", str, ""],
         meta=CommandMeta(
             compact=True,
             description="生成该群最近消息数量的内容总结或指定内容总结",
@@ -90,10 +89,10 @@ async def _(
     bot: Bot,
     event: GroupMessageEvent,
     message_count: Match[int],
-    content: Match[str | None],
+    content: Match[str],
 ):
     message_count = message_count.result
-    content = content.result
+    content = content.result.strip()
 
     # 消息数量检查
     if not validate_message_count(message_count):
@@ -104,12 +103,12 @@ async def _(
 
     # 冷却时间，针对人，而非群
     if cool_time := validate_cool_down(event.user_id):
-        await summary_group.finish(f"请等待 {cool_time} 秒后再次使用。")
+        await summary_group.finish(f"请等待 {cool_time} 秒后再次使用。", at_sender=True)
 
     group_id = event.group_id
     messages = await get_group_msg_history(bot, group_id, message_count)
     if not messages:
-        await summary_group.finish("未能获取到聊天记录。")
+        await summary_group.finish("未能获取到聊天记录。", at_sender=True)
 
     summary = await messages_summary(messages, content)
     await send_summary(bot, group_id, summary)
@@ -126,7 +125,8 @@ async def _(
     data = {"time": int(time.result), "least_message_count": least_message_count.result}
     store.set(group_id, data)
     await summary_set.finish(
-        f"已设置定时总结，将在{time.result}时当群消息相交昨天多于{least_message_count.result}条消息时生成内容总结。"
+        f"已设置定时总结，将在{time.result}时当群消息相交昨天多于{least_message_count.result}条消息时生成内容总结。",
+        at_sender=True,
     )
 
 
@@ -135,4 +135,4 @@ async def _(event: GroupMessageEvent):
     group_id = event.group_id
     store = Store()
     store.remove(group_id)
-    await summary_remove.finish("已取消本群定时总结。")
+    await summary_remove.finish("已取消本群定时总结。", at_sender=True)
