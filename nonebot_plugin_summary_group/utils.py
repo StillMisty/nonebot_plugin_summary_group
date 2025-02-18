@@ -1,5 +1,6 @@
 import asyncio
 from collections import defaultdict
+from itertools import dropwhile
 from math import ceil
 from pathlib import Path
 from nonebot import get_bot, require
@@ -46,15 +47,10 @@ def validate_cool_down(user_id: int) -> bool | int:
     return False
 
 
-async def get_group_msg_history(
-    bot: Bot, group_id: int, count: int
-) -> list[dict[str, str]]:
-    """获取群聊消息记录"""
-    messages = await bot.get_group_msg_history(group_id=group_id, count=count)
-
+async def process_message(messages, bot: Bot, group_id: int) -> str:
     # 预先收集所有被@的QQ号，同时过滤掉非法消息
     qq_set: set[str] = set()
-    for msg in messages["messages"]:
+    for msg in messages:
         valid_segments = [
             segment for segment in msg["message"] if isinstance(segment, dict)
         ]
@@ -79,7 +75,7 @@ async def get_group_msg_history(
         )
 
     result = []
-    for message in messages["messages"]:
+    for message in messages:
         text_segments = []
         for segment in message["message"]:
             if segment["type"] == "text":
@@ -100,7 +96,20 @@ async def get_group_msg_history(
     return result
 
 
-async def messages_summary(messages: list[dict[str, str]], content: str) -> str:
+async def get_group_msg_history(
+    bot: Bot, group_id: int, count: int
+) -> list[dict[str, str]]:
+    """获取群聊消息记录"""
+    messages = (await bot.get_group_msg_history(group_id=group_id, count=count))[
+        "messages"
+    ]
+
+    return await process_message(messages, bot, group_id)
+
+
+async def messages_summary(
+    messages: list[dict[str, str]], content: str | None = None
+) -> str:
     """使用模型对历史消息进行总结"""
     prompt = (
         f"请详细总结对话中仅与{content}相关的内容，用中文回答。"
@@ -120,15 +129,26 @@ async def send_summary(bot: Bot, group_id: int, summary: str):
 
 
 async def scheduler_send_summary(group_id: int, least_message_count: int):
-    """定时发送总结，当获取的最早消息超过一天时不发送"""
+    """定时发送总结，总结消息范围为所设置总结条数中最近24小时内的消息，若消息数量小于总结最小值则不总结"""
     bot = get_bot()
     messages = (
         await bot.get_group_msg_history(group_id=group_id, count=least_message_count)
     )["messages"]
-    if not messages:
+
+    if len(messages) < config.summary_min_length:
         return
-    if messages[0]["time"] > (datetime.now() - timedelta(hours=24)).timestamp():
+
+    deadline = (datetime.now() - timedelta(hours=24)).timestamp()
+
+    # 如果最小总结条数的消息时间在24小时前，则不进行总结
+    if messages[-config.summary_min_length]["time"] <= deadline:
         return
+
+    # 如果最大总结条数的消息时间在24小时前，则截取其中24小时内的消息
+    if messages[0]["time"] <= deadline:
+        messages = list(dropwhile(lambda msg: msg["time"] <= deadline, messages))
+
+    messages = await process_message(messages, bot, group_id)
 
     summary = await messages_summary(messages)
 
