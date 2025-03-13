@@ -2,15 +2,15 @@ from nonebot import get_driver, require
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent
 from nonebot.plugin import PluginMetadata
 
-from .utils import get_group_msg_history
-from .Config import config, Config
+from .Config import Config, config
 from .Store import Store
 from .utils import (
+    get_group_msg_history,
     messages_summary,
-    validate_message_count,
-    validate_cool_down,
-    set_scheduler,
     send_summary,
+    set_scheduler,
+    validate_cool_down,
+    validate_message_count,
 )
 
 require("nonebot_plugin_alconna")
@@ -21,7 +21,6 @@ from nonebot_plugin_alconna import (  # noqa: E402
     Match,
     on_alconna,
 )
-
 
 __plugin_meta__ = PluginMetadata(
     name="群聊总结",

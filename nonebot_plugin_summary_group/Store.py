@@ -1,6 +1,7 @@
-from nonebot import require
-from typing import TypedDict
 import json
+from typing import TypedDict
+
+from nonebot import require
 
 require("nonebot_plugin_localstore")
 from nonebot_plugin_localstore import get_plugin_data_file  # noqa: E402

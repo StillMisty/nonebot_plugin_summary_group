@@ -1,15 +1,16 @@
 import asyncio
 from collections import defaultdict
+from datetime import datetime, timedelta
 from itertools import dropwhile
 from math import ceil
 from pathlib import Path
+
 from nonebot import get_bot, require
 from nonebot.adapters.onebot.v11 import Bot, MessageSegment
-from datetime import datetime, timedelta
 
-from .Store import Store
-from .Model import detect_model
 from .Config import config
+from .Model import detect_model
+from .Store import Store
 
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler  # noqa: E402
@@ -62,17 +63,7 @@ async def process_message(messages, bot: Bot, group_id: int) -> str:
         msg["message"] = valid_segments
 
     # 将所有被@的QQ号转换为其群昵称
-    qq_name: dict[str, str] = {}
-    if qq_set:
-        member_infos = await asyncio.gather(
-            *(bot.get_group_member_info(group_id=group_id, user_id=qq) for qq in qq_set)
-        )
-        qq_name.update(
-            {
-                str(info["user_id"]): info["card"] or info["nickname"]
-                for info in member_infos
-            }
-        )
+    qq_name = await fetch_member_nicknames(bot, group_id, qq_set)
 
     result = []
     for message in messages:
@@ -82,9 +73,10 @@ async def process_message(messages, bot: Bot, group_id: int) -> str:
                 text = segment["data"]["text"].strip()
                 if text:  # 只添加非空文本
                     text_segments.append(text)
-            elif segment["type"] == "at":  # 处理@消息，替换为昵称
-                qq = segment["data"]["qq"]
-                text_segments.append(f"@{qq_name[qq]}")
+            elif (
+                segment["type"] == "at" and segment["data"]["qq"] in qq_name
+            ):  # 处理@消息，替换为昵称
+                text_segments.append(f"@{qq_name[segment['data']['qq']]}")
 
         if text_segments:  # 只处理有内容的消息
             sender = message["sender"]["card"] or message["sender"]["nickname"]
@@ -94,6 +86,30 @@ async def process_message(messages, bot: Bot, group_id: int) -> str:
         result.pop()  # 去除请求总结的命令
 
     return result
+
+
+async def fetch_member_nicknames(
+    bot: Bot, group_id: int, qq_set: set[str]
+) -> dict[str, str]:
+    """批量获取群成员的昵称"""
+    qq_name: dict[str, str] = {}
+    if qq_set:
+        member_infos = await asyncio.gather(
+            *(
+                bot.get_group_member_info(group_id=group_id, user_id=qq)
+                for qq in qq_set
+            ),
+            return_exceptions=True,
+        )
+        qq_name.update(
+            {
+                str(info["user_id"]): info["card"] or info["nickname"]
+                for info in member_infos
+                if not isinstance(info, Exception)
+            }
+        )
+
+    return qq_name
 
 
 async def get_group_msg_history(
