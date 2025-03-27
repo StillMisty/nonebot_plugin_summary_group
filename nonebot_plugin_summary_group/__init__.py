@@ -1,5 +1,6 @@
 from nonebot import get_driver, require
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent
+from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
 
 from .Config import Config, config
@@ -61,6 +62,7 @@ summary_set = on_alconna(
     ),
     priority=5,
     block=True,
+    permission=SUPERUSER,
 )
 
 summary_remove = on_alconna(
@@ -73,6 +75,7 @@ summary_remove = on_alconna(
     ),
     priority=5,
     block=True,
+    permission=SUPERUSER,
 )
 
 driver = get_driver()
