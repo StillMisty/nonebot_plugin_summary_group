@@ -42,20 +42,6 @@ async def ensure_workers_running():
         _summary_worker_tasks.append(task)
 
 
-# 获取队列状态的辅助函数
-def get_queue_status() -> dict:
-    """获取当前队列状态"""
-    return {
-        "queue_size": summary_queue.qsize(),
-        "queue_full": summary_queue.full(),
-        "queue_empty": summary_queue.empty(),
-        "active_workers": len(
-            [task for task in _summary_worker_tasks if not task.done()]
-        ),
-        "max_workers": _max_workers,
-    }
-
-
 async def queue_summary_request(messages: list[dict[str, str]], prompt: str) -> str:
     """将总结请求加入队列并等待结果"""
     # 确保工作线程池正常运行
