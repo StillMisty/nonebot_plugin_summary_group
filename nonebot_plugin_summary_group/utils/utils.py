@@ -8,9 +8,11 @@ from pathlib import Path
 from nonebot import get_bot, require
 from nonebot.adapters.onebot.v11 import Bot, MessageSegment
 
-from .Config import config
-from .Model import detect_model
-from .Store import Store
+from ..Config import config
+from ..Store import Store
+from .queue_request import (
+    queue_summary_request,
+)
 
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler  # noqa: E402
@@ -28,7 +30,6 @@ if config.summary_in_png:
         )
 
 
-model = detect_model()
 cool_down = defaultdict(lambda: datetime.now())
 
 
@@ -132,7 +133,7 @@ async def messages_summary(
         if content
         else "请详细总结这个群聊的内容脉络，要有什么人说了什么，用中文回答。"
     )
-    return await model.summary_history(messages, prompt)
+    return await queue_summary_request(messages, prompt)
 
 
 async def send_summary(bot: Bot, group_id: int, summary: str):

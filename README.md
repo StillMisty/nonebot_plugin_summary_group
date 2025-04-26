@@ -22,18 +22,21 @@ pip install nonebot_plugin_summary_group
 
 在机器人文件夹的`env`文件中添加下表中配置项。
 
-|       配置项       |      必填      |       默认       |                   说明                    |
-| :----------------: | :------------: | :--------------: | :---------------------------------------: |
-|     gemini_key     | 与OpenAI二选一 |       None       |              gemini接口密钥               |
-|  openai_base_url   | 与Gemini二选一 |       None       |              openai接口地址               |
-|   openai_api_key   | 与Gemini二选一 |       None       |              openai接口密钥               |
-|   summary_model    |       是       | gemini-2.0-flash |                 模型名称                  |
-|       proxy        |       否       |       None       |                 代理设置                  |
-| summary_max_length |       否       |       1000       |               总结最大长度                |
-| summary_min_length |       否       |        50        |               总结最小长度                |
-| summary_cool_down  |       否       |        0         | 总结冷却时间（0即无冷却，针对人，而非群） |
-|      time_out      |       否       |       120        |             API 请求超时时间              |
-|   summary_in_png   |       否       |      False       |          总结是否以图片形式发送           |
+|         配置项         |      必填      |       默认       |                   说明                    |
+| :--------------------: | :------------: | :--------------: | :---------------------------------------: |
+|       gemini_key       | 与OpenAI二选一 |       None       |              gemini接口密钥               |
+|    openai_base_url     | 与Gemini二选一 |       None       |              openai接口地址               |
+|     openai_api_key     | 与Gemini二选一 |       None       |              openai接口密钥               |
+|     summary_model      |       是       | gemini-2.0-flash |                 模型名称                  |
+|         proxy          |       否       |       None       |                 代理设置                  |
+|   summary_max_length   |       否       |       1000       |               总结最大长度                |
+|   summary_min_length   |       否       |        50        |               总结最小长度                |
+|   summary_cool_down    |       否       |        0         | 总结冷却时间（0即无冷却，针对人，而非群） |
+|        time_out        |       否       |       120        |             API 请求超时时间              |
+|     summary_in_png     |       否       |      False       |          总结是否以图片形式发送           |
+| summary_max_queue_size |       否       |        10        |         请求模型总结队列最大大小          |
+| summary_queue_timeout  |       否       |       300        |     请求模型总结队列等待超时时间(秒)      |
+| summary_queue_workers  |       否       |        2         |        最大并发请求模型总结 API 数        |
 
 - 使用Gemini需要配置 gemini_key 与 summary_model。
 - 使用OpenAI兼容的API则需要配置 openai_base_url 、 openai_api_key 与 summary_model。

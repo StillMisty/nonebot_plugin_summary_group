@@ -5,7 +5,7 @@ from nonebot.plugin import PluginMetadata
 
 from .Config import Config, config
 from .Store import Store
-from .utils import (
+from .utils.utils import (
     get_group_msg_history,
     messages_summary,
     send_summary,
