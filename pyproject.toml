@@ -1,6 +1,6 @@
 [project]
 name = "nonebot-plugin-summary-group"
-version = "0.7.6"
+version = "0.7.7"
 authors = [{ name = "StillMisty", email = "1772797842@qq.com" }]
 description = "基于 Nonebot2，使用 AI 分析群聊记录，生成讨论内容的总结。"
 readme = "README.md"

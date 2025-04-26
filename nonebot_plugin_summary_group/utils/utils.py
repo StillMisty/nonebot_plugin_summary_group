@@ -17,17 +17,18 @@ from .queue_request import (
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler  # noqa: E402
 
+
+def get_css_path() -> Path:
+    """获取css路径"""
+    return Path(__file__).parent.parent / "assert" / "github-markdown-dark.css"
+
+
 if config.summary_in_png:
     require("nonebot_plugin_htmlrender")
     from nonebot_plugin_htmlrender import md_to_pic  # type: ignore
 
     async def generate_image(summary: str):
-        return await md_to_pic(
-            summary,
-            css_path=(
-                Path(__file__).parent / "assert" / "github-markdown-dark.css"
-            ).resolve(),
-        )
+        return await md_to_pic(summary, css_path=get_css_path())
 
 
 cool_down = defaultdict(lambda: datetime.now())
