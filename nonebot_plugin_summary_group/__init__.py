@@ -4,7 +4,7 @@ from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
 
 from .Config import Config, config
-from .Store import Store
+from .Store import Data, Store
 from .utils.utils import (
     get_group_msg_history,
     messages_summary,
@@ -93,11 +93,11 @@ async def _(
     message_count: Match[int],
     content: Match[str],
 ):
-    message_count = message_count.result
-    content = content.result.strip()
+    message_count_get = message_count.result
+    content_get = content.result.strip()
 
     # 消息数量检查
-    if not validate_message_count(message_count):
+    if not validate_message_count(message_count_get):
         await summary_group.finish(
             f"总结消息数量应在 {config.summary_min_length} 到 {config.summary_max_length} 之间。",
             at_sender=True,
@@ -108,11 +108,11 @@ async def _(
         await summary_group.finish(f"请等待 {cool_time} 秒后再次使用。", at_sender=True)
 
     group_id = event.group_id
-    messages = await get_group_msg_history(bot, group_id, message_count)
+    messages = await get_group_msg_history(bot, group_id, message_count_get)
     if not messages:
         await summary_group.finish("未能获取到聊天记录。", at_sender=True)
 
-    summary = await messages_summary(messages, content)
+    summary = await messages_summary(messages, content_get)
     await send_summary(bot, group_id, summary)
 
 
@@ -124,7 +124,7 @@ async def _(
 ):
     group_id = event.group_id
     store = Store()
-    data = {"time": int(time.result), "least_message_count": least_message_count.result}
+    data = Data(time=int(time.result), least_message_count=least_message_count.result)
     store.set(group_id, data)
     await summary_set.finish(
         f"已设置定时总结，将在{time.result}时当群消息相较昨天同时多于{least_message_count.result}条消息时生成内容总结。",

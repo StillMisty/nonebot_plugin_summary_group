@@ -7,7 +7,7 @@ from .Config import config
 
 class Model:
     @abstractmethod
-    def summary_history(self, messages: list[str], prompt: str) -> str:
+    async def summary_history(self, messages: list[dict[str, str]], prompt: str) -> str:
         pass
 
 
@@ -58,7 +58,7 @@ class OpenAI(Model):
         self.openai_api_key = openai_api_key
         self.summary_model = summary_model
 
-    async def summary_history(self, messages: list[str], prompt: str) -> str:
+    async def summary_history(self, messages: list[dict[str, str]], prompt: str) -> str:
         url = f"{self.openai_base_url}/chat/completions"
         headers = {
             "Content-Type": "application/json",

@@ -6,7 +6,7 @@ from math import ceil
 from pathlib import Path
 
 from nonebot import get_bot, require
-from nonebot.adapters.onebot.v11 import Bot, MessageSegment
+from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
 from ..Config import config
 from ..Store import Store
@@ -27,7 +27,7 @@ if config.summary_in_png:
     require("nonebot_plugin_htmlrender")
     from nonebot_plugin_htmlrender import md_to_pic  # type: ignore
 
-    async def generate_image(summary: str):
+    async def generate_image(summary: str) -> bytes:
         return await md_to_pic(summary, css_path=get_css_path())
 
 
@@ -50,7 +50,7 @@ def validate_cool_down(user_id: int) -> bool | int:
     return False
 
 
-async def process_message(messages, bot: Bot, group_id: int) -> str:
+async def process_message(messages, bot: Bot, group_id: int) -> list[dict[str, str]]:
     # 预先收集所有被@的QQ号，同时过滤掉非法消息
     qq_set: set[str] = set()
     for msg in messages:
@@ -67,7 +67,7 @@ async def process_message(messages, bot: Bot, group_id: int) -> str:
     # 将所有被@的QQ号转换为其群昵称
     qq_name = await fetch_member_nicknames(bot, group_id, qq_set)
 
-    result = []
+    result: list[dict[str, str]] = []
     for message in messages:
         text_segments = []
         for segment in message["message"]:
@@ -81,7 +81,7 @@ async def process_message(messages, bot: Bot, group_id: int) -> str:
                 text_segments.append(f"@{qq_name[segment['data']['qq']]}")
 
         if text_segments:  # 只处理有内容的消息
-            sender = message["sender"]["card"] or message["sender"]["nickname"]
+            sender: str = message["sender"]["card"] or message["sender"]["nickname"]
             result.append({sender: "".join(text_segments)})
 
     if result:  # 安全检查
@@ -98,14 +98,14 @@ async def fetch_member_nicknames(
     if qq_set:
         member_infos = await asyncio.gather(
             *(
-                bot.get_group_member_info(group_id=group_id, user_id=qq)
+                bot.get_group_member_info(group_id=group_id, user_id=int(qq))
                 for qq in qq_set
             ),
             return_exceptions=True,
         )
         qq_name.update(
             {
-                str(info["user_id"]): info["card"] or info["nickname"]
+                str(info["user_id"]): info["card"] or info["nickname"]  # type: ignore
                 for info in member_infos
                 if not isinstance(info, Exception)
             }
@@ -141,7 +141,9 @@ async def send_summary(bot: Bot, group_id: int, summary: str):
     """发送总结"""
     if config.summary_in_png:
         img = await generate_image(summary)
-        await bot.send_group_msg(group_id=group_id, message=MessageSegment.image(img))
+        await bot.send_group_msg(
+            group_id=group_id, message=Message(MessageSegment.image(img))
+        )
     else:
         await bot.send_group_msg(group_id=group_id, message=summary.strip())
 
@@ -166,11 +168,11 @@ async def scheduler_send_summary(group_id: int, least_message_count: int):
     if messages[0]["time"] <= deadline:
         messages = list(dropwhile(lambda msg: msg["time"] <= deadline, messages))
 
-    messages = await process_message(messages, bot, group_id)
+    messages = await process_message(messages, bot, group_id)  # type: ignore
 
     summary = await messages_summary(messages)
 
-    await send_summary(bot, group_id, summary)
+    await send_summary(bot, group_id, summary)  # type: ignore
 
 
 def set_scheduler():

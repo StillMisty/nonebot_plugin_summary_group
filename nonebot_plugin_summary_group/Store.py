@@ -16,11 +16,11 @@ class Store:
     _instance = None  # 单例模式
     data: dict[str, Data]
 
-    def __new__(self):
-        if self._instance is None:
-            self._instance = super().__new__(self)
-            self._instance.__initialized = False  # 添加一个标志来跟踪初始化状态
-        return self._instance
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.__initialized = False  # 添加一个标志来跟踪初始化状态
+        return cls._instance
 
     def __init__(self):
         if self.__initialized:  # 避免多次初始化
