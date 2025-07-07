@@ -1,3 +1,4 @@
+from arclet.alconna import AllParam
 from nonebot import get_driver, require
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent
 from nonebot.permission import SUPERUSER
@@ -11,6 +12,7 @@ from .utils.utils import (
     send_summary,
     set_scheduler,
     validate_cool_down,
+    validate_group_event,
     validate_message_count,
 )
 
@@ -37,7 +39,7 @@ summary_group = on_alconna(
     Alconna(
         "总结",
         Args["message_count", int],
-        Args["content", str, ""],
+        Args["content", AllParam, None],
         meta=CommandMeta(
             compact=True,
             description="生成该群最近消息数量的内容总结或指定内容总结",
@@ -53,13 +55,15 @@ summary_set = on_alconna(
         Args[
             "time",
             "re:(0?[0-9]|1[0-9]|2[0-3])",
-        ]["least_message_count", int, config.summary_max_length],
+        ],
+        Args["least_message_count", int, config.summary_max_length],
         meta=CommandMeta(
             compact=True,
             description="定时生成消息数量的内容总结",
             usage="总结定时 [时间] [最少消息数量]\n时间：0~23\n最少消息数量：默认为总结最大长度",
         ),
     ),
+    rule=validate_group_event,
     priority=5,
     block=True,
     permission=SUPERUSER,
@@ -73,6 +77,7 @@ summary_remove = on_alconna(
             usage="总结定时取消",
         ),
     ),
+    rule=validate_group_event,
     priority=5,
     block=True,
     permission=SUPERUSER,
@@ -94,7 +99,9 @@ async def _(
     content: Match[str],
 ):
     message_count_get = message_count.result
-    content_get = content.result.strip()
+    if content_get := content.result:
+        content_get = content_get.strip()
+    print(content_get)
 
     # 消息数量检查
     if not validate_message_count(message_count_get):

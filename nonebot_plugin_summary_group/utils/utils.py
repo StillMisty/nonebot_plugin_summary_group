@@ -6,7 +6,7 @@ from math import ceil
 from pathlib import Path
 
 from nonebot import get_bot, require
-from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
+from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
 
 from ..Config import config
 from ..Store import Store
@@ -32,6 +32,10 @@ if config.summary_in_png:
 
 
 cool_down = defaultdict(lambda: datetime.now())
+
+
+def validate_group_event(event) -> bool:
+    return isinstance(event, GroupMessageEvent)
 
 
 def validate_message_count(num: int) -> bool:
