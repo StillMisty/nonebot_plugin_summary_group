@@ -1,8 +1,17 @@
+<div align="center">
+  <a href="https://nonebot.dev/store/plugins">
+    <img src="./docs/NoneBotPlugin.svg" width="300" alt="logo">
+  </a>
+</div>
+<div align="center">
+
 # nonebot_plugin_summary_group
+
+</div>
 
 ## 📖 介绍
 
-基于Nonebot2，使用 AI 分析群聊记录，生成讨论内容的总结。
+基于Nonebot2，使用 AI 分析群聊记录，生成讨论内容的总结，亦或是总结特定人或事。
 
 ## 💿 安装
 
@@ -20,14 +29,14 @@ pip install nonebot_plugin_summary_group
 
 ## ⚙️ 配置
 
-在机器人文件夹的`env`文件中添加下表中配置项。
+如无特殊需求，仅需在`env`文件中配置必填项。
 
 |         配置项         |      必填      |       默认       |                   说明                    |
 | :--------------------: | :------------: | :--------------: | :---------------------------------------: |
 |       gemini_key       | 与OpenAI二选一 |       None       |              gemini接口密钥               |
 |    openai_base_url     | 与Gemini二选一 |       None       |              openai接口地址               |
 |     openai_api_key     | 与Gemini二选一 |       None       |              openai接口密钥               |
-|     summary_model      |       是       | gemini-2.0-flash |                 模型名称                  |
+|     summary_model      |       是       | gemini-2.5-flash |                 模型名称                  |
 |         proxy          |       否       |       None       |                 代理设置                  |
 |   summary_max_length   |       否       |       1000       |               总结最大长度                |
 |   summary_min_length   |       否       |        50        |               总结最小长度                |
