@@ -42,6 +42,8 @@ class Gemini(Model):
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429:
                     return "API 调用次数已达上限，请稍后再试"
+                if e.response.status_code == 503:
+                    return "API 服务不可用，请稍后再试"
                 return f"API请求失败 (HTTP {e.response.status_code})"
             except (httpx.RequestError, KeyError, ValueError) as e:
                 return f"请求发生错误: {str(e)}"

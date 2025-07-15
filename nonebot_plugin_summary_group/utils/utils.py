@@ -134,9 +134,9 @@ async def messages_summary(
 ) -> str:
     """使用模型对历史消息进行总结"""
     prompt = (
-        f"请详细总结对话中仅与{content}相关的内容，用中文回答。"
+        f"请根据以下群聊记录，主要描述与“{content}”相关的事件经过，要求条理清晰、内容完整，用中文输出总结。"
         if content
-        else "请详细总结这个群聊的内容脉络，要有什么人说了什么，用中文回答。"
+        else "请根据以下群聊记录，详细讲述主要事件经过，要有什么人讲了什么，最后对主要参与者进行简短评价，要求条理清晰、内容完整，用中文输出总结。"
     )
     return await queue_summary_request(messages, prompt)
 

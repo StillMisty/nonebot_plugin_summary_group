@@ -101,7 +101,6 @@ async def _(
     message_count_get = message_count.result
     if content_get := content.result:
         content_get = content_get.strip()
-    print(content_get)
 
     # 消息数量检查
     if not validate_message_count(message_count_get):
