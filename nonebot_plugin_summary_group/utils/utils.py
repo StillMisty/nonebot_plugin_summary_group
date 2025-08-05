@@ -64,7 +64,7 @@ async def process_message(messages, bot: Bot, group_id: int) -> list[dict[str, s
         qq_set.update(
             segment["data"]["qq"]
             for segment in valid_segments
-            if segment["type"] == "at"
+            if segment["type"] == "at" and segment["data"]["qq"].isdigit()
         )
         msg["message"] = valid_segments
 
@@ -102,7 +102,7 @@ async def fetch_member_nicknames(
     if qq_set:
         member_infos = await asyncio.gather(
             *(
-                bot.get_group_member_info(group_id=group_id, user_id=int(qq))
+                bot.get_group_member_info(group_id=group_id, user_id=qq)
                 for qq in qq_set
             ),
             return_exceptions=True,
