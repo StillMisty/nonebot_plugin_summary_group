@@ -42,7 +42,7 @@ pip install nonebot_plugin_summary_group
 |   summary_min_length   |       否       |        50        |               总结最小长度                |
 |   summary_cool_down    |       否       |        0         | 总结冷却时间（0即无冷却，针对人，而非群） |
 |        time_out        |       否       |       120        |             API 请求超时时间              |
-|     summary_in_png     |       否       |      False       |          总结是否以图片形式发送           |
+|     summary_in_png     |       否       |      False       |      总结是否以图片形式发送（重要）       |
 | summary_max_queue_size |       否       |        10        |         请求模型总结队列最大大小          |
 | summary_queue_timeout  |       否       |       300        |     请求模型总结队列等待超时时间(秒)      |
 | summary_queue_workers  |       否       |        2         |        最大并发请求模型总结 API 数        |
