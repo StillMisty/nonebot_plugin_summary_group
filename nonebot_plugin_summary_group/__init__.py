@@ -24,6 +24,7 @@ from nonebot_plugin_alconna import (  # noqa: E402
     Match,
     on_alconna,
 )
+from nonebot_plugin_alconna.uniseg.segment import At  # noqa: E402
 
 __plugin_meta__ = PluginMetadata(
     name="群聊总结",
@@ -43,7 +44,7 @@ summary_group = on_alconna(
         meta=CommandMeta(
             compact=True,
             description="生成该群最近消息数量的内容总结或指定内容总结",
-            usage="总结 [消息数量] [内容]\n内容为可选",
+            usage="总结 [消息数量] [内容]\n内容为可选，支持@用户",
         ),
     ),
     priority=5,
@@ -100,7 +101,45 @@ async def _(
 ):
     message_count_get = message_count.result
     if content_get := content.result:
-        content_get = content_get.strip()
+        # 将内容转换为消息段列表
+        text_parts = []
+        segments = (
+            content_get if isinstance(content_get, (list, tuple)) else [content_get]
+        )
+
+        # 获取群成员信息将@转换为昵称
+        for seg in segments:
+            if isinstance(seg, At):
+                try:
+                    info = await bot.get_group_member_info(
+                        group_id=event.group_id, user_id=int(seg.target)
+                    )
+                    text_parts.append(
+                        f"@{info.get('card') or info.get('nickname', seg.target)}"
+                    )
+                except Exception:
+                    # 如果获取群成员信息失败，直接使用QQ号
+                    text_parts.append(f"@{seg.target}")
+            elif isinstance(seg, str):
+                # 只有当字符串不为空且不只包含空白字符时才添加
+                stripped = seg.strip()
+                if stripped:
+                    text_parts.append(stripped)
+            elif hasattr(seg, "target"):  # 处理其他可能的@类型消息段
+                text_parts.append(f"@{seg.target}")
+            elif hasattr(seg, "text"):  # 处理其他可能的文本类型消息段
+                stripped = str(seg.text).strip()
+                if stripped:
+                    text_parts.append(stripped)
+            else:
+                # 其他类型的消息段，尝试转换为字符串
+                try:
+                    text = str(seg).strip()
+                    if text:
+                        text_parts.append(text)
+                except Exception:
+                    continue
+        content_get = "".join(text_parts).strip()
 
     # 消息数量检查
     if not validate_message_count(message_count_get):
