@@ -47,7 +47,7 @@ class Config(BaseModel):
     summary_max_length: int = Field(1000, description="总结内容的最大长度限制")
     summary_min_length: int = Field(50, description="总结内容的最小长度限制")
     summary_cool_down: int = Field(0, description="单个用户调用总结功能的冷却时间(秒)")
-    summary_in_png: bool = Field(False, description="是否将总结结果以图片形式发送")
+    summary_in_png: bool = Field(True, description="是否将总结结果以图片形式发送")
 
     # --- 异步任务队列设置 ---
     summary_max_queue_size: int = Field(
