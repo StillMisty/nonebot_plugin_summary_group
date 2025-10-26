@@ -29,34 +29,59 @@ pip install nonebot_plugin_summary_group
 
 ## ⚙️ 配置
 
-如无特殊需求，仅需在`env`文件中配置必填项。
+### AI 账户配置项
 
-|         配置项         |      必填      |       默认       |                   说明                    |
-| :--------------------: | :------------: | :--------------: | :---------------------------------------: |
-|       gemini_key       | 与OpenAI二选一 |       None       |              gemini接口密钥               |
-|    openai_base_url     | 与Gemini二选一 |       None       |              openai接口地址               |
-|     openai_api_key     | 与Gemini二选一 |       None       |              openai接口密钥               |
-|     summary_model      |       是       | gemini-2.5-flash |                 模型名称                  |
-|         proxy          |       否       |       None       |                 代理设置                  |
-|   summary_max_length   |       否       |       1000       |               总结最大长度                |
-|   summary_min_length   |       否       |        50        |               总结最小长度                |
-|   summary_cool_down    |       否       |        0         | 总结冷却时间（0即无冷却，针对人，而非群） |
-|        time_out        |       否       |       120        |             API 请求超时时间              |
-|     summary_in_png     |       否       |      False       |      总结是否以图片形式发送（重要）       |
-| summary_max_queue_size |       否       |        10        |         请求模型总结队列最大大小          |
-| summary_queue_timeout  |       否       |       300        |     请求模型总结队列等待超时时间(秒)      |
-| summary_queue_workers  |       否       |        2         |        最大并发请求模型总结 API 数        |
+每个账户（Gemini/OpenAI）都支持以下基础配置，至少填写一个账户，填多个时，当默认API错误时可根据优先级依次降级处理：
 
-- 使用Gemini需要配置 gemini_key 与 summary_model。
-- 使用OpenAI兼容的API则需要配置 openai_base_url 、 openai_api_key 与 summary_model。
+- `nickname`: 账户的唯一别名，作为首先调用的模型（必填）
+- `api_key`: 该账户的 API Key（必填）
+- `model`: 该账户要使用的模型名称（必填）
+- `proxy`: 为该账户单独设置代理
+- `time_out`: 该账户的 API 请求超时时间(秒)，默认 60
 
-若同时配置Gemini与OpenAI，则优先使用Gemini。
+#### OpenAI 兼容格式特定配置
 
-使用`nonebot_plugin_htmlrender`渲染图片，为节省不必要的消耗，此包不会作为该项目依赖，需要自行安装并设置`summary_in_png=True`以使用图片发送。
+- `provider`: 固定为 "openai"（必填）
+- `base_url`: OpenAI API 兼容格式的访问地址（必填）
 
-``` shell
-nb plugin install nonebot_plugin_htmlrender
+#### Gemini 特定配置
+
+- `provider`: 固定为 "gemini"（必填）
+
+#### AI 账户配置示例
+
+```env
+# Gemini 配置
+ai_accounts_0_provider="gemini"
+ai_accounts_0_nickname="gemini-1"
+ai_accounts_0_api_key="your_gemini_api_key"
+ai_accounts_0_model="gemini-2.5-flash"
+
+# OpenAI 配置
+ai_accounts_1_provider="openai"
+ai_accounts_1_nickname="deepseek-1"
+ai_accounts_1_base_url="https://api.deepseek.com"
+ai_accounts_1_api_key="your_openai_api_key"
+ai_accounts_1_model="deepseek-chat"
+
+# 根据需要可添加更多账户配置
+# ai_accounts_3_...
 ```
+
+### 功能配置项
+
+如无特殊需求，使用默认配置即可：
+
+|          配置项          | 类型  | 默认值 |                           说明                           |
+| :----------------------: | :---: | :----: | :------------------------------------------------------: |
+| default_account_nickname |  str  |  None  | 默认使用的账户别名。如果未设置，将使用列表中的第一个账户 |
+|    summary_max_length    |  int  |  1000  |                  总结内容的最大长度限制                  |
+|    summary_min_length    |  int  |   50   |                  总结内容的最小长度限制                  |
+|    summary_cool_down     |  int  |   0    |            单个用户调用总结功能的冷却时间(秒)            |
+|      summary_in_png      | bool  |  True  |               是否将总结结果以图片形式发送               |
+|  summary_max_queue_size  |  int  |   10   |              等待处理的总结任务队列最大数量              |
+|  summary_queue_timeout   |  int  |  300   |            任务在队列中等待处理的超时时间(秒)            |
+|  summary_queue_workers   |  int  |   2    |               同时处理总结任务的最大并发数               |
 
 ## 🕹️ 使用
 
