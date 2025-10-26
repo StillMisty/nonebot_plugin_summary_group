@@ -57,6 +57,6 @@ async def queue_summary_request(messages: list[dict[str, str]], prompt: str) -> 
         # 等待结果，设置超时时间
         return await asyncio.wait_for(future, timeout=config.summary_queue_timeout)
     except asyncio.TimeoutError:
-        return "很抱歉，总结请求处理超时。请稍后再试。"
+        return "总结请求处理超时,请稍后再试。"
     except Exception as e:
-        return f"处理总结请求时发生错误: {str(e)}"
+        return f"总结请求处理失败, {e}"
