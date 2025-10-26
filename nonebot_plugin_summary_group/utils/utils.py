@@ -28,7 +28,7 @@ if config.summary_in_png:
     from nonebot_plugin_htmlrender import md_to_pic  # type: ignore
 
     async def generate_image(summary: str) -> bytes:
-        return await md_to_pic(summary, css_path=get_css_path())
+        return await md_to_pic(summary, css_path=str(get_css_path()))
 
 
 cool_down = defaultdict(lambda: datetime.now())
@@ -102,7 +102,7 @@ async def fetch_member_nicknames(
     if qq_set:
         member_infos = await asyncio.gather(
             *(
-                bot.get_group_member_info(group_id=group_id, user_id=qq)
+                bot.get_group_member_info(group_id=group_id, user_id=qq)  # type: ignore 传 str | int 均可
                 for qq in qq_set
             ),
             return_exceptions=True,
