@@ -102,4 +102,3 @@ class Config(BaseModel):
 
 
 config = get_plugin_config(Config)
-print("Loaded summary group config:", config)
