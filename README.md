@@ -52,20 +52,20 @@ pip install nonebot_plugin_summary_group
 
 ```env
 # Gemini 配置
-ai_accounts_0_provider="gemini"
-ai_accounts_0_nickname="gemini-1"
-ai_accounts_0_api_key="your_gemini_api_key"
-ai_accounts_0_model="gemini-2.5-flash"
+ai_accounts__0__provider="gemini"
+ai_accounts__0__nickname="gemini-1"
+ai_accounts__0__api_key="your_gemini_api_key"
+ai_accounts__0__model="gemini-2.5-flash"
 
 # OpenAI 配置
-ai_accounts_1_provider="openai"
-ai_accounts_1_nickname="deepseek-1"
-ai_accounts_1_base_url="https://api.deepseek.com"
-ai_accounts_1_api_key="your_openai_api_key"
-ai_accounts_1_model="deepseek-chat"
+ai_accounts__1__provider="openai"
+ai_accounts__1__nickname="deepseek-1"
+ai_accounts__1__base_url="https://api.deepseek.com"
+ai_accounts__1__api_key="your_openai_api_key"
+ai_accounts__1__model="deepseek-chat"
 
 # 根据需要可添加更多账户配置
-# ai_accounts_3_...
+# ai_accounts__3__...
 ```
 
 ### 功能配置项
