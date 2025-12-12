@@ -30,21 +30,6 @@ class Gemini(Model):
         self.proxy = proxy
         self.time_out = time_out
 
-    # curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent" \
-    #   -H 'Content-Type: application/json' \
-    #   -H 'X-goog-api-key: AIzaSyBu0GPfcIL80OGY6x__4Bubrq2W2A3wMbs' \
-    #   -X POST \
-    #   -d '{
-    #     "contents": [
-    #       {
-    #         "parts": [
-    #           {
-    #             "text": "Explain how AI works in a few words"
-    #           }
-    #         ]
-    #       }
-    #     ]
-    #   }'
     async def summary_history(self, messages: list[dict[str, str]], prompt: str) -> str:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.summary_model}:generateContent"
         headers = {
